@@ -83,7 +83,8 @@ const CHANNELS = [
   { key: 'kakaobuy', name: 'Kakobuy' },
   { key: 'uidbuy', name: 'Uidbuy' },
   { key: 'hipobuy', name: 'Hipobuy' },
-  { key: 'litbuy', name: 'Litbuy' }
+  { key: 'litbuy', name: 'Litbuy' },
+  { key: 'boonbuy', name: 'Boonbuy' }
 ];
 
 function extractItemID(url) {
@@ -99,7 +100,8 @@ function buildLinks(cleanUrl) {
     kakaobuy: 'https://item.kakobuy.com/item/details?url=' + encodeURIComponent(canonicalUrl),
     uidbuy: 'https://www.uidbuy.com/product/3/' + itemID,
     hipobuy: 'https://hipobuy.com/product/weidian/' + itemID,
-    litbuy: 'https://litbuy.com/product/weidian/' + itemID + '?linkSearch=true'
+    litbuy: 'https://litbuy.com/product/weidian/' + itemID + '?linkSearch=true',
+    boonbuy: 'https://boonbuy.com/product/weidian/' + itemID
   };
 }
 
