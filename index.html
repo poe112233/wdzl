@@ -80,7 +80,7 @@
 <script>
 const CHANNELS = [
   { key: 'oopbuy', name: 'Oopbuy' },
-  { key: 'kakaobuy', name: 'Kakobuy' },
+  { key: 'kakobuy', name: 'Kakobuy' },
   { key: 'uidbuy', name: 'Uidbuy' },
   { key: 'hipobuy', name: 'Hipobuy' },
   { key: 'litbuy', name: 'Litbuy' },
@@ -88,8 +88,14 @@ const CHANNELS = [
 ];
 
 function extractItemID(url) {
-  const m = url.match(/itemID[=&](\d+)/);
-  return m ? m[1] : 'unknown';
+  const s = String(url || '');
+  const m =
+    s.match(/[?&]item[iI][dD]=(\d+)/) ||
+    s.match(/[?&]vItemId=(\d+)/i) ||
+    s.match(/\/item\/(\d{6,})/) ||
+    s.match(/^(\d{6,})$/) ||
+    s.match(/\/(\d{8,})(?:[-.]|$)/);
+  return m ? m[1] : '';
 }
 
 function buildLinks(cleanUrl) {
@@ -97,7 +103,7 @@ function buildLinks(cleanUrl) {
   const canonicalUrl = 'https://weidian.com/item.html?itemID=' + itemID;
   return {
     oopbuy: 'https://oopbuy.com/product/weidian/' + itemID + '?inviteCode=TYZZSCDV0',
-    kakaobuy: 'https://item.kakobuy.com/item/details?url=' + encodeURIComponent(canonicalUrl),
+    kakobuy: 'https://kakobuy.com/item/details?url=' + encodeURIComponent(canonicalUrl),
     uidbuy: 'https://www.uidbuy.com/product/3/' + itemID,
     hipobuy: 'https://hipobuy.com/product/weidian/' + itemID,
     litbuy: 'https://litbuy.com/product/weidian/' + itemID + '?linkSearch=true',
@@ -183,9 +189,19 @@ function generate() {
   const raw = document.getElementById('input').value.trim();
   if (!raw) return;
 
-  const lines = raw.split(/\n/).map(l => l.trim()).filter(l => l);
+  const all = raw.split(/\n/).map(l => l.trim()).filter(l => l);
+  const lines = all.filter((l) => extractItemID(l));
+  const bad = all.filter((l) => !extractItemID(l));
   const results = document.getElementById('results');
   results.innerHTML = '';
+
+  if (bad.length) {
+    const warn = document.createElement('p');
+    warn.className = 'empty';
+    warn.textContent = '以下链接没能识别出微店商品 ID，已跳过：' + bad.join(' / ');
+    results.appendChild(warn);
+  }
+  if (!lines.length) return;
 
   // 合并排版文本
   const mergedBlocks = lines.map((url) => buildMergedText(buildLinks(url)));
